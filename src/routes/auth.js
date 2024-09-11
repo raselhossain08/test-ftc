@@ -11,6 +11,6 @@ const {
 router.post('/register', registerUser);
 router.post('/login', loginUser);
 router.post('/forgot/password', forgotPassword);
-router.put('/resetpassword/:token', resetPassword);
+router.put('/reset/password/:token', resetPassword);
 
 module.exports = router;

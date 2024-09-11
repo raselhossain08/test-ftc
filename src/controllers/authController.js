@@ -67,7 +67,7 @@ const forgotPassword = async (req, res) => {
     user.resetTokenExpire = Date.now() + 15 * 60 * 1000;
     await user.save();
 
-    const resetUrl = `http://localhost:5000/api/auth/reset/password/${resetToken}`;
+    const resetUrl = `https://test-ftc.vercel.app/api/auth/reset/password/${resetToken}`;
 
     await sendEmail({
       to: user.email,
@@ -85,9 +85,19 @@ const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (!token) {
+    return res.status(400).json({ message: 'Token is required' });
+  }
 
+  if (!password) {
+    return res.status(400).json({ message: 'Password is required' });
+  }
+
+  try {
+    // Verify the JWT token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    
+    // Find the user by decoded ID, matching resetToken and ensuring the token is not expired
     const user = await User.findOne({
       _id: decoded.id,
       resetToken: token,
@@ -98,15 +108,20 @@ const resetPassword = async (req, res) => {
       return res.status(400).json({ message: 'Invalid or expired token' });
     }
 
+    // Update the user's password and clear the reset token fields
     user.password = password;
     user.resetToken = undefined;
     user.resetTokenExpire = undefined;
+
+    // Save the updated user document
     await user.save();
 
+    // Respond with success message
     res.json({ message: 'Password reset successful' });
   } catch (error) {
-    res.status(500).json({ message: 'Server error' });
+    // Catch any errors during the process and respond with an error message
+    console.error('Error during password reset:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-
 module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
