@@ -75,7 +75,7 @@ const forgotPassword = async (req, res) => {
       text: `Click this link to reset your password: ${resetUrl}`,
     });
 
-    res.json({ message: 'Reset link sent to email' , resetToken});
+    res.json({ message: 'Reset link sent to email' });
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
@@ -118,11 +118,7 @@ const resetPassword = async (req, res) => {
 
     // Respond with success message
     res.json({ message: 'Password reset successful' });
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
-      expiresIn: '1h',
-    });
-
-    res.json({ user, token });
+    
   } catch (error) {
     // Catch any errors during the process and respond with an error message
     console.error('Error during password reset:', error);
