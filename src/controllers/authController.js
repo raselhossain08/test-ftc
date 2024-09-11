@@ -75,7 +75,7 @@ const forgotPassword = async (req, res) => {
       text: `Click this link to reset your password: ${resetUrl}`,
     });
 
-    res.json({ message: 'Reset link sent to email' });
+    res.json({ message: 'Reset link sent to email' , resetToken});
   } catch (error) {
     res.status(500).json({ message: 'Server error' });
   }
