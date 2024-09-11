@@ -118,6 +118,11 @@ const resetPassword = async (req, res) => {
 
     // Respond with success message
     res.json({ message: 'Password reset successful' });
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+      expiresIn: '1h',
+    });
+
+    res.json({ user, token });
   } catch (error) {
     // Catch any errors during the process and respond with an error message
     console.error('Error during password reset:', error);
