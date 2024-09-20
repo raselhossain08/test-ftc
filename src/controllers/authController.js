@@ -2,7 +2,7 @@ const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/sendEmail');
-
+const cloudinary = require('cloudinary').v2;
 const registerUser = async (req, res) => {
   const { name, email, password } = req.body;
 
@@ -128,6 +128,7 @@ const resetPassword = async (req, res) => {
 // update profile
 
 // Update user profile (name, email, password)
+
 const updateProfile = async (req, res) => {
   const userId = req.params.id; // Ensure you get the authenticated user's ID
   const { name, email, password } = req.body;
@@ -177,7 +178,11 @@ const updateProfile = async (req, res) => {
 };
 
 //  profile photo upload
-
+cloudinary.config({
+  cloud_name: "dirdbnxe1",
+  api_key: "424511362532329",
+  api_secret: "pcuAYMOb9rJ0wC2uhbDDGkjE3Mc",
+});
 const uploadOrGetProfilePhoto = async (req, res) => {
   const userId = req.params.id; // Ensure the user ID is available from the authenticated session or token
 
@@ -194,11 +199,15 @@ const uploadOrGetProfilePhoto = async (req, res) => {
         return res.status(400).json({ message: 'No file uploaded' });
       }
 
-      const baseURL = process.env.BASE_URL || 'http://localhost:5000';
-      user.profilePhoto = `${baseURL}/uploads/${req.file.filename}`; // Store the relative path
+      const result = await cloudinary.uploader.upload(req.file.path, {
+        folder: 'profile_photos',
+        public_id: `${userId}-profile-photo`, // Optional: name the file with the user ID
+        overwrite: true,
+      });
+      user.profilePhoto = result.secure_url;
       await user.save();
 
-      res.json({
+    res.json({
         message: 'Profile photo uploaded successfully',
         profilePhoto: user.profilePhoto,
       });

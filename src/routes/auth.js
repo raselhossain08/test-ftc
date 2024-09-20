@@ -17,7 +17,7 @@ router.post('/forgot/password', forgotPassword);
 router.put('/reset/password/:token', resetPassword);
 router.put('/update/profile/:id', updateProfile);
 // profile photo 
-router.post('/profile/:id',upload.single('file'), uploadOrGetProfilePhoto);
+router.post('/profile/:id',upload.single('profilePhoto'), uploadOrGetProfilePhoto);
 
 
 
