@@ -125,4 +125,99 @@ const resetPassword = async (req, res) => {
     res.status(500).json({ message: 'Server error', error: error.message });
   }
 };
-module.exports = { registerUser, loginUser, forgotPassword, resetPassword };
+// update profile
+
+// Update user profile (name, email, password)
+const updateProfile = async (req, res) => {
+  const userId = req.params.id; // Ensure you get the authenticated user's ID
+  const { name, email, password } = req.body;
+
+  try {
+    // Find the user by ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    // Check if the new email is already in use by another user
+    if (email && email !== user.email) {
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already in use' });
+      }
+      user.email = email; // Update email if not in use
+    }
+
+    // Update the name if provided
+    if (name) {
+      user.name = name;
+    }
+
+    // Update the password if provided (hash the new password)
+    if (password) {
+      const salt = await bcrypt.genSalt(10);
+      user.password = await bcrypt.hash(password, salt);
+    }
+
+    // Save the updated user profile
+    await user.save();
+
+    res.json({
+      message: 'Profile updated successfully',
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+      },
+    });
+  } catch (error) {
+    console.error('Error updating profile:', error);
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+//  profile photo upload
+
+const uploadOrGetProfilePhoto = async (req, res) => {
+  const userId = req.params.id; // Ensure the user ID is available from the authenticated session or token
+
+  try {
+    // Fetch the user from the database
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (req.method === 'POST') {
+      // Handle POST request for uploading profile photo
+      if (!req.file) {
+        return res.status(400).json({ message: 'No file uploaded' });
+      }
+
+      const baseURL = process.env.BASE_URL || 'http://localhost:5000';
+      user.profilePhoto = `${baseURL}/uploads/${req.file.filename}`; // Store the relative path
+      await user.save();
+
+      res.json({
+        message: 'Profile photo uploaded successfully',
+        profilePhoto: user.profilePhoto,
+      });
+    } else if (req.method === 'GET') {
+      // Handle GET request to retrieve the profile photo URL
+      if (!user.profilePhoto) {
+        return res.status(404).json({ message: 'No profile photo found' });
+      }
+
+      res.json({
+        message: 'Profile photo retrieved successfully',
+        profilePhoto: user.profilePhoto,
+      });
+    } else {
+      return res.status(405).json({ message: 'Method not allowed' });
+    }
+  } catch (error) {
+    res.status(500).json({ message: 'Server error', error: error.message });
+  }
+};
+
+module.exports = { registerUser, loginUser, forgotPassword, resetPassword,updateProfile,uploadOrGetProfilePhoto };

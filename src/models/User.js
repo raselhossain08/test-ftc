@@ -7,6 +7,7 @@ const UserSchema = new mongoose.Schema({
   password: { type: String, required: true },
   resetToken: String,
   resetTokenExpire: Date,
+  profilePhoto: { type: String },
 });
 
 UserSchema.pre('save', async function (next) {
