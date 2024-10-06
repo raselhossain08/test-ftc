@@ -22,8 +22,7 @@ app.use(cors()); // Enable CORS
 app.use(express.json()); // Built-in body parser for JSON
 app.use(bodyParser.urlencoded({ extended: true })); // To handle URL-encoded form data
 app.use(express.urlencoded({ extended: true }));
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 
 // Basic route to check if the server is running
 app.get('/', (req, res) => {
