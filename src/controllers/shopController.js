@@ -1,19 +1,26 @@
 const Shop = require('../models/Shop');
-
+const cloudinary = require('cloudinary').v2;
+//  upload
+cloudinary.config({
+  cloud_name: "dj78wvkmf",
+  api_key: "311213775718542",
+  api_secret: "8tqZGGneJfKQiPcP1nkDvF34ZFU",
+});
 // Add product Controller
 const addShop = async (req, res) => {
   console.log('Request Body:', req.body);
   console.log('File:', req.file);
 
   const { productName, price,link } = req.body;
-  const baseURL = process.env.BASE_URL || 'http://localhost:5000';
-  const productImage = req.file ? `${baseURL}/uploads/${req.file.filename}` : '';
-
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    folder: 'product_photos',
+    overwrite: true,
+  });
 
   try {
     const newShop = new Shop({
     productName,
-    productImage,
+    productImage:result.secure_url,
     price,
     link,
     });

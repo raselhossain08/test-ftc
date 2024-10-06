@@ -3,9 +3,9 @@ const { addLanguage, getAllLanguage, getLanguageById, editLanguage } = require('
 const upload = require('../middlewares/upload'); // Multer middleware for handling file uploads
 const router = express.Router();
 
-router.post('/add', upload.single('audio'), addLanguage);
+router.post('/add', upload.single('file'), addLanguage);
 router.get('/', getAllLanguage);
 router.get('/:id', getLanguageById);
-router.put('/:id', upload.single('audio'), editLanguage);
+router.put('/:id', upload.single('file'), editLanguage);
 
 module.exports = router;

@@ -1,14 +1,21 @@
 const Country = require('../models/Country');
-
+const cloudinary = require('cloudinary').v2;
+//  upload
+cloudinary.config({
+  cloud_name: "dj78wvkmf",
+  api_key: "311213775718542",
+  api_secret: "8tqZGGneJfKQiPcP1nkDvF34ZFU",
+});
 // Add Country Controller
 const addCountry = async (req, res) => {
   console.log('Request Body:', req.body);
   console.log('File:', req.file);
 
   const { name, languages } = req.body;
-  const baseURL = process.env.BASE_URL || 'http://localhost:5000';
-  const flag = req.file ? `${baseURL}/uploads/${req.file.filename}` : '';
-
+  const result = await cloudinary.uploader.upload(req.file.path, {
+    folder: 'country_photo',
+    overwrite: true,
+  });
   if (!name || !languages) {
     return res.status(400).json({ error: 'Name and languages are required fields.' });
   }
@@ -16,8 +23,8 @@ const addCountry = async (req, res) => {
   try {
     const newCountry = new Country({
       name,
-      flag,
-      languages: languages.split(','), // Assuming languages are passed as a comma-separated string
+      flag:result.secure_url,
+      languages // Assuming languages are passed as a comma-separated string
     });
 
     await newCountry.save();
@@ -68,7 +75,7 @@ const editCountry = async (req, res) => {
 
     country.name = name || country.name;
     country.flag = flag || country.flag;
-    country.languages = languages ? languages.split(',') : country.languages;
+    country.languages = languages || country.languages;
 
     await country.save();
     res.status(200).json({ message: 'Country updated successfully', country });

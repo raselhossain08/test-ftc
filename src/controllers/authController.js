@@ -179,9 +179,9 @@ const updateProfile = async (req, res) => {
 
 //  profile photo upload
 cloudinary.config({
-  cloud_name: "dirdbnxe1",
-  api_key: "424511362532329",
-  api_secret: "pcuAYMOb9rJ0wC2uhbDDGkjE3Mc",
+  cloud_name: "dj78wvkmf",
+  api_key: "311213775718542",
+  api_secret: "8tqZGGneJfKQiPcP1nkDvF34ZFU",
 });
 const uploadOrGetProfilePhoto = async (req, res) => {
   const userId = req.params.id; // Ensure the user ID is available from the authenticated session or token
